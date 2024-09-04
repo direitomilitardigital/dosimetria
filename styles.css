@@ -66,3 +66,9 @@ label[for="finalPenalty"] {
     font-weight: bold;
     color: black;
 }
+
+/* Novo estilo para centralizar o texto de contato */
+.contact-info {
+    text-align: center;
+    margin-top: 20px;
+}
