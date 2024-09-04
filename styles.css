@@ -9,7 +9,10 @@ body {
 .container {
     background-color: white;
     border: 2px solid #ccc;
-    padding: 20px;
+    padding-right: 20px; /* Mantém o padding na direita */
+    padding-left: 0; /* Remove o padding na esquerda */
+    padding-top: 20px;
+    padding-bottom: 20px;
     max-width: 800px;
     margin: auto;
 }
@@ -29,6 +32,7 @@ body {
 label, select {
     margin: 5px 0;
     display: block;
+    padding-left: 20px; /* Ajusta o padding dentro das fases */
 }
 
 button {
@@ -41,6 +45,7 @@ button {
     border: none;
     cursor: pointer;
     border-radius: 5px;
+    padding-left: 20px; /* Ajusta o padding no botão */
 }
 
 button:hover {
@@ -53,11 +58,13 @@ label[for="judicialCircumstances"],
 label[for="aggravating"],
 label[for="majorantes"] {
     color: red;
+    padding-left: 20px; /* Ajusta o padding nos labels */
 }
 
 label[for="mitigating"],
 label[for="minorantes"] {
     color: blue;
+    padding-left: 20px; /* Ajusta o padding nos labels */
 }
 
 label[for="basePenalty"],
@@ -65,10 +72,12 @@ label[for="intermediatePenalty"],
 label[for="finalPenalty"] {
     font-weight: bold;
     color: black;
+    padding-left: 20px; /* Ajusta o padding nos labels */
 }
 
-/* Novo estilo para centralizar o texto de contato */
+/* Estilo para centralizar e alinhar o texto de contato */
 .contact-info {
-    text-align: center;
+    text-align: left;
+    padding-left: 20px; /* Mantém o alinhamento com a fase */
     margin-top: 20px;
 }
