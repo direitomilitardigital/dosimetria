@@ -9,10 +9,7 @@ body {
 .container {
     background-color: white;
     border: 2px solid #ccc;
-    padding-right: 20px; /* Mantém o padding na direita */
-    padding-left: 0; /* Remove o padding na esquerda */
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding: 20px;
     max-width: 800px;
     margin: auto;
 }
@@ -32,7 +29,6 @@ body {
 label, select {
     margin: 5px 0;
     display: block;
-    padding-left: 20px; /* Ajusta o padding dentro das fases */
 }
 
 button {
@@ -45,7 +41,7 @@ button {
     border: none;
     cursor: pointer;
     border-radius: 5px;
-    padding-left: 20px; /* Ajusta o padding no botão */
+    text-align: center;
 }
 
 button:hover {
@@ -58,13 +54,11 @@ label[for="judicialCircumstances"],
 label[for="aggravating"],
 label[for="majorantes"] {
     color: red;
-    padding-left: 20px; /* Ajusta o padding nos labels */
 }
 
 label[for="mitigating"],
 label[for="minorantes"] {
     color: blue;
-    padding-left: 20px; /* Ajusta o padding nos labels */
 }
 
 label[for="basePenalty"],
@@ -72,12 +66,23 @@ label[for="intermediatePenalty"],
 label[for="finalPenalty"] {
     font-weight: bold;
     color: black;
-    padding-left: 20px; /* Ajusta o padding nos labels */
 }
 
-/* Estilo para centralizar e alinhar o texto de contato */
-.contact-info {
-    text-align: left;
-    padding-left: 20px; /* Mantém o alinhamento com a fase */
+/* Estilo para a seção de contato no footer */
+footer {
     margin-top: 20px;
+    padding-top: 20px;
+    border-top: 2px solid #ccc;
+    text-align: left;
+}
+
+footer .contact {
+    max-width: 800px; /* Mesma largura da .container */
+    margin: auto;
+    padding: 0 20px; /* Mesma padding da .container */
+}
+
+footer .contact p {
+    margin: 5px 0;
+    font-size: 14px;
 }
