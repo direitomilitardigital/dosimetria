@@ -1,92 +1,129 @@
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('penaltyForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // Impede o envio do formulário
+    const method1Radio = document.querySelector('input[name="calculationMethod"][value="method1"]');
+    const method2Radio = document.querySelector('input[name="calculationMethod"][value="method2"]');
+    const maxPenaltySection = document.getElementById('maxPenaltySection');
+    const resultadoPenaMinimaLabel = document.getElementById('resultadoPenaMinimaLabel');
+    const resultadoPenaMinima = document.getElementById('resultadoPenaMinima');
+    const resultadoPenaMediaLabel = document.getElementById('resultadoPenaMediaLabel');
+    const resultadoPenaMedia = document.getElementById('resultadoPenaMedia');
+    const penaMinimaDiasLabel = document.getElementById('penaMinimaDiasLabel');
+    const penaMinimaDias = document.getElementById('penaMinimaDias');
 
-        // Função para converter fração em decimal
-        function parseFraction(fraction) {
-            const parts = fraction.split('/');
-            return parts.length === 2 ? parseInt(parts[0]) / parseInt(parts[1]) : parseFloat(parts[0]);
+    method1Radio.addEventListener('change', function() {
+        maxPenaltySection.style.display = 'none';
+        resultadoPenaMinimaLabel.textContent = 'Pena Mínima:';
+        resultadoPenaMediaLabel.style.display = 'none';
+        resultadoPenaMedia.style.display = 'none';
+        penaMinimaDiasLabel.style.display = 'none';
+        penaMinimaDias.style.display = 'none';
+    });
+
+    method2Radio.addEventListener('change', function() {
+        maxPenaltySection.style.display = 'block';
+        resultadoPenaMinimaLabel.textContent = 'Pena Mínima:';
+        resultadoPenaMediaLabel.style.display = 'block';
+        resultadoPenaMedia.style.display = 'block';
+        penaMinimaDiasLabel.style.display = 'block';
+        penaMinimaDias.style.display = 'block';
+    });
+
+    function parseFraction(fraction) {
+        const parts = fraction.split('/');
+        return parts.length === 2 ? parseInt(parts[0]) / parseInt(parts[1]) : parseFloat(parts[0]);
+    }
+
+    function convertDaysToYearsMonthsDays(totalDias) {
+        const anos = Math.floor(totalDias / 365);
+        const restoDiasAposAnos = totalDias % 365;
+        const meses = Math.floor(restoDiasAposAnos / 30);
+        const dias = Math.floor(restoDiasAposAnos % 30); // Arredondar para baixo os dias restantes
+        return { anos, meses, dias };
+    }
+
+    // Função para calcular todas as fases
+    function calcularTodasAsFases() {
+        // 1ª Fase: Calcular Pena Mínima e Pena Média
+        const minAnos = parseInt(document.getElementById('minYears').value) || 0;
+        const minMeses = parseInt(document.getElementById('minMonths').value) || 0;
+        const minDias = parseInt(document.getElementById('minDays').value) || 0;
+
+        const minMesesEmDias = minMeses * 30;
+        const minAnosEmDias = minAnos * 365;
+        const totalDiasMin = minAnosEmDias + minMesesEmDias + minDias;
+
+        resultadoPenaMinima.value = `${totalDiasMin} dias`;
+        penaMinimaDias.value = `${totalDiasMin} dias`;
+
+        if (method2Radio.checked) {
+            const maxAnos = parseInt(document.getElementById('maxYears').value) || 0;
+            const maxMeses = parseInt(document.getElementById('maxMonths').value) || 0;
+            const maxDias = parseInt(document.getElementById('maxDays').value) || 0;
+
+            const maxMesesEmDias = maxMeses * 30;
+            const maxAnosEmDias = maxAnos * 365;
+            const totalDiasMax = maxAnosEmDias + maxMesesEmDias + maxDias;
+
+            const penaMedia = (totalDiasMin + totalDiasMax) / 2;
+
+            resultadoPenaMedia.value = `${Math.floor(penaMedia)} dias`; // Arredondar para baixo
         }
 
-        // Função para converter dias para anos, meses e dias
-        function convertDaysToYearsMonthsDays(totalDias) {
-            const anos = Math.floor(totalDias / 365);
-            const restoDiasAposAnos = totalDias % 365;
-            const meses = Math.floor(restoDiasAposAnos / 30);
-            const dias = restoDiasAposAnos % 30;
-            return { anos, meses, dias };
-        }
-
-        // Obter valores dos campos de entrada
-        const anos = parseInt(document.getElementById('years').value) || 0;
-        const meses = parseInt(document.getElementById('months').value) || 0;
-        const dias = parseInt(document.getElementById('days').value) || 0;
-
-        // Converter anos e meses para dias
-        const mesesEmDias = meses * 30; // Aproximando cada mês como 30 dias
-        const anosEmDias = anos * 365; // Aproximando cada ano como 365 dias
-
-        // Somar todos os dias para obter a pena mínima total em dias
-        const totalDias = anosEmDias + mesesEmDias + dias;
-
-        // Atualizar o campo de exibição da pena mínima em dias
-        document.getElementById('resultadoPenaMinima').value = totalDias + ' dias';
-
-        // Obter a fração da primeira fase e o número de circunstâncias judiciais
+        // 2ª Fase: Calcular Pena Base
         const fraçãoPrimeiraFase = parseFraction(document.getElementById('firstPhaseFraction').value) || 0;
         const circunstânciasJudiciais = parseInt(document.getElementById('judicialCircumstances').value) || 0;
 
-        // Calcular a pena base usando a fórmula fornecida:
-        // Pena Base = Pena Mínima + (Circunstâncias Judiciais * Fração * Pena Mínima)
-        const aumentoCircunstâncias = circunstânciasJudiciais * fraçãoPrimeiraFase * totalDias;
-        const penaBase = totalDias + aumentoCircunstâncias;
+        let penaBase;
 
-        // Converter a pena base de dias para anos, meses e dias
+        if (method2Radio.checked) {
+            const penaMedia = Math.floor(parseInt(resultadoPenaMedia.value.split(' ')[0])) || 0;
+            penaBase = totalDiasMin + Math.floor((penaMedia * fraçãoPrimeiraFase) * circunstânciasJudiciais);
+        } else {
+            penaBase = totalDiasMin + Math.floor(circunstânciasJudiciais * (totalDiasMin * fraçãoPrimeiraFase));
+        }
+
+        document.getElementById('penaBaseDias').value = penaBase;
+
         const { anos: anosPenaBase, meses: mesesPenaBase, dias: diasPenaBase } = convertDaysToYearsMonthsDays(penaBase);
 
-        // Atualizar o campo da pena base com o resultado em anos, meses e dias
         document.getElementById('basePenalty').value = `${anosPenaBase} anos, ${mesesPenaBase} meses, ${diasPenaBase} dias`;
 
-       // Segunda fase - Calcular a pena intermediária
-    // Obter fração para a segunda fase
-    const fraçãoSegundaFase = parseFraction(document.getElementById('intermediateFraction').value) || 0;
+        // 3ª Fase: Calcular Pena Intermediária
+        const fraçãoSegundaFase = parseFraction(document.getElementById('intermediateFraction').value) || 0;
+        const atenuantes = parseInt(document.getElementById('mitigating').value) || 0;
+        const agravantes = parseInt(document.getElementById('aggravating').value) || 0;
 
-    // Calcular o valor "x"
-    const resultadoParcialX = penaBase * fraçãoSegundaFase;
+        const resultadoParcialX = penaBase * fraçãoSegundaFase;
+        const resultadoY = atenuantes - agravantes;
 
-    // Obter número de atenuantes e agravantes
-    const atenuantes = parseInt(document.getElementById('mitigating').value) || 0;
-    const agravantes = parseInt(document.getElementById('aggravating').value) || 0;
+        let penaIntermediariaEmDias = penaBase - Math.floor(resultadoParcialX * resultadoY);
 
-    // Calcular o valor "y"
-    const resultadoY = atenuantes - agravantes;
+        if (penaIntermediariaEmDias < 0) {
+            penaIntermediariaEmDias = 0;
+        }
 
-    // Calcular a pena intermediária: pena base - (resultadoParcialX * resultadoY)
-    const penaIntermediaria = penaBase - (resultadoParcialX * resultadoY);
+        const { anos: anosPenaIntermediaria, meses: mesesPenaIntermediaria, dias: diasPenaIntermediaria } = convertDaysToYearsMonthsDays(penaIntermediariaEmDias);
 
-    // Converter a pena intermediária de dias para anos, meses e dias
-    const { anos: anosPenaIntermediaria, meses: mesesPenaIntermediaria, dias: diasPenaIntermediaria } = convertDaysToYearsMonthsDays(penaIntermediaria);
+        document.getElementById('intermediatePenalty').value = `${Math.floor(penaIntermediariaEmDias)} dias (${anosPenaIntermediaria} anos, ${mesesPenaIntermediaria} meses, ${diasPenaIntermediaria} dias)`;
 
-    // Atualizar o campo da pena intermediária com o resultado em anos, meses e dias
-    document.getElementById('intermediatePenalty').value = `${anosPenaIntermediaria} anos, ${mesesPenaIntermediaria} meses, ${diasPenaIntermediaria} dias`;
-// Terceira fase - Calcular a pena definitiva
-const fraçãoTerceiraFase = parseFraction(document.getElementById('finalFraction').value) || 0;
-const minorantes = parseInt(document.getElementById('minorantes').value) || 0;
-const majorantes = parseInt(document.getElementById('majorantes').value) || 0;
+        // 4ª Fase: Calcular Pena Definitiva
+        const fraçãoTerceiraFase = parseFraction(document.getElementById('finalFraction').value) || 0;
+        const minorantes = parseInt(document.getElementById('minorantes').value) || 0;
+        const majorantes = parseInt(document.getElementById('majorantes').value) || 0;
 
-// Calcular o valor "x" da terceira fase
-const resultadoParcialX3 = penaIntermediaria * fraçãoTerceiraFase;
+        const resultadoParcialX3 = penaIntermediariaEmDias * fraçãoTerceiraFase;
+        const resultadoY3 = minorantes - majorantes;
 
-// Calcular o valor "y" da terceira fase
-const resultadoY3 = minorantes - majorantes;
+        let penaDefinitivaEmDias = penaIntermediariaEmDias - Math.floor(resultadoParcialX3 * resultadoY3);
 
-// Calcular a pena definitiva: pena intermediária - (resultadoParcialX3 * resultadoY3)
-const penaDefinitiva = penaIntermediaria - (resultadoParcialX3 * resultadoY3);
+        if (penaDefinitivaEmDias < 0) {
+            penaDefinitivaEmDias = 0;
+        }
 
-// Converter a pena definitiva de dias para anos, meses e dias
-const { anos: anosPenaDefinitiva, meses: mesesPenaDefinitiva, dias: diasPenaDefinitiva } = convertDaysToYearsMonthsDays(penaDefinitiva);
+        const { anos: anosPenaDefinitiva, meses: mesesPenaDefinitiva, dias: diasPenaDefinitiva } = convertDaysToYearsMonthsDays(penaDefinitivaEmDias);
 
-// Atualizar o campo da pena definitiva com o resultado em anos, meses e dias
-document.getElementById('finalPenalty').value = `${anosPenaDefinitiva} anos, ${mesesPenaDefinitiva} meses, ${diasPenaDefinitiva} dias`;
-});
+        document.getElementById('finalPenalty').value = `${Math.floor(penaDefinitivaEmDias)} dias (${anosPenaDefinitiva} anos, ${mesesPenaDefinitiva} meses, ${diasPenaDefinitiva} dias)`;
+    }
+
+    // Vincular a função ao botão de calcular todas as fases
+    document.getElementById('calcularTodasFases').addEventListener('click', calcularTodasAsFases);
 });
